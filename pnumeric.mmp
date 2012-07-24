@@ -1,0 +1,31 @@
+TARGETTYPE  dll
+TARGET      _pnumeric.pyd
+TARGETPATH  \system\libs
+
+
+NOSTRICTDEF
+DEFFILE     pnumeric.frz
+
+#ifdef EKA2
+CAPABILITY NetworkServices LocalServices ReadUserData WriteUserData UserEnvironment
+//NetworkServices LocalServices ReadUserData WriteUserData Location UserEnvironment PowerMgmt ProtServ SwEvent SurroundingsDD ReadDeviceData WriteDeviceData TrustedUI
+
+#endif
+
+
+SYSTEMINCLUDE \epoc32\include
+SYSTEMINCLUDE \epoc32\include\libc
+SYSTEMINCLUDE \epoc32\include\python
+
+USERINCLUDE .
+
+LIBRARY python222.lib
+LIBRARY euser.lib efsrv.lib apmime.lib charconv.lib bafl.lib hal.lib
+LIBRARY estlib.lib /* Necessary only if you use the C standard library */
+
+SOURCE pnumeric.c
+SOURCE matrix.c
+SOURCE vector.c
+SOURCE fft.c
+SOURCE cgensupport.c
+SOURCE m2\m2.c

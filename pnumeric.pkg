@@ -1,0 +1,26 @@
+; Installation file for S60 Python pnumeric library.
+;
+; Languages
+; none - English only by default
+;
+; The non-localised, globally unique vendor name (mandatory)
+:"pNumeric"
+
+; Package header
+; Name, UID3, Major, Minor, Build, Package-type
+#{"Python pNumeric library"},(0x8032262A),1,1,0,TYPE=SISAPP
+;
+;Localised Vendor name
+%{"pNumeric"}
+
+;Supports S60 v 3.0
+;Product/platform version UID, Major, Minor, Build, Product ID
+(0x101F7961), 0, 0, 0, {"Series60ProductID"}
+
+; Python for Series 60 version 1.0.0 required.
+;(0xF0201510), 1, 0, 0, {"Python for Series 60"}
+;
+; Files to install
+;
+"pnumeric.py"-"c:\resource\pnumeric.py"
+"\Epoc32\release\gcce\urel\_pnumeric.pyd"-"c:\sys\bin\_pnumeric.pyd"

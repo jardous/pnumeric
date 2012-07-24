@@ -1,0 +1,236 @@
+\documentclass{article}
+
+\title{pNumeric module for Python}
+\author{Jiri Popek}
+\authoraddress{
+        Email: \email{jiri.popek@gmail.com}
+}
+
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction \label{intro}}
+    pNumeric module for Python is set of functions and datatypes for signal
+    processing focused on Kalman filter utilization.
+
+    The Kalman filter is created from scratch and all support routines are
+    also provided. So you do not need any additional libraries - Numeric, 
+    etc. There is also FFT algorithm available.
+  
+    Because it deals with matrix algebra, some support algorithms had to be implemented. 
+    There are functions for matrix manipulation and matrix operations - matrix
+    multiplication, determinant computing, matrix inversion.
+    
+    No 3rd party libraries are needed while using pNumeric.
+    
+    Early versions has been tested even for PyS60 (Python for Symbian S60). There are build scripts
+    still available.
+
+
+\section{Installation \label{installation}}
+  pNumeric uses distutils, so the installation on PC is pretty simple - just
+  run:
+  
+  \begin{verbatim}
+  python setup.py install
+  \end{verbatim}
+  
+  Note that you'll need root privilegies to install it.
+  You can just build it by typing
+  
+  \begin{verbatim}
+  python setup.py install
+  \end{verbatim}
+  
+  and copy \file{pnumeric.so} to the application's path.
+  
+  There are also build scripts for PyS60.
+
+  Note that POSIX standard operating system is essential with build environment set.
+  Preferred is Linux operating system with GNU GCC.
+
+
+\section{Module level functions \label{modulefuncts}}
+    
+    Module pNumeric has several methods. The table gives a brief desctiption:
+    
+    \begin{tabular}{|l|l|} \hline
+    \textbf{function name} & \textbf{Description} \\ \hline
+    ones(n)      & returns Matrix of size n with all items set to 1 \\
+    zeros(n)     & returns Matrix of size n with all items set to 0 \\
+    eye(n)       & returns eye Matrix of size n with zeros everywhere except ones at main diagonal \\
+    kf_process(...)  & Kalman filter function \\
+    fft(Vector v)       & Fast Fourier Transform of v \\
+    mean(Vector v)       & mean value of v \\
+    rms(Vector v)       & Root Mean Square of v \\
+    \end{tabular}
+
+
+\section{Defined datatypes \label{datatypes}}
+  
+  \subsection{Vector \label{Vector}}
+    Vector datatype is used to store measurements or other vectors. To create 
+    Vector object just simply type:
+    \begin{verbatim}
+    from pnumeric import *
+    >>> v = Vector([1, 2, 3])
+    >>> v
+    [1.0, 2.0, 3.0]
+    \end{verbatim}
+    
+    Vector constructor accepts list or tuple with all numeric values.
+
+    It is possible to get Vertor item by accessing it as list:
+    
+    \begin{verbatim}
+    >>> v[2]
+    3.0
+    \end{verbatim}
+    
+    Also changing any of items is possible:
+    \begin{verbatim}
+    >>> v[1] = 88
+    >>> v
+    [1.0, 88.0, 3.0]
+    \end{verbatim}
+  
+  \subsection{Matrix \label{Matrix}}
+    Matrix is used to store matrixes and implements matrix algebra related
+    functions.
+    
+    Use following syntax to create Matrix object
+    
+    \begin{verbatim}
+    from pnumeric import *
+    m2 = Matrix([[.1, .2], [-.2, .1]])
+    m3 = Matrix([[.2, .4, .2], [-.2, .2, .0], [.2, .2, -.2]])
+    \end{verbatim}
+    Vector constructor accepts list or tuple with all numeric values.
+    
+    We can use also tuple instead of lists - be sure you specify the same 
+    length of sublists (subtuples).
+
+    Matrix object has following methods:
+    
+    \begin{tabular}{|l|l|} \hline
+    \textbf{property name} & \textbf{Description} \\ \hline
+    det      & returns determinant of the matrix \\
+    inv      & returns inversion matrix \\
+    \end{tabular}
+    
+    Matrix object has following properties:
+    
+    \begin{tabular}{|l|l|} \hline
+    \textbf{property name} & \textbf{Description} \\ \hline
+    rows      & returns number of Matrix columns \\
+    cols      & returns number of Matrix columns \\
+    shape     & returns an Matrix shape tuple (rows, cols) \\
+    \end{tabular}
+
+    It is possible to get Matrix item by accessing as list. This
+    return matrix as a Vector type:
+    
+    \begin{verbatim}
+    >>> m3[2]
+    [-0.2, 0.2, 0.0]
+    \end{verbatim}
+    
+    Also change any of items is possible:
+    
+    \begin{verbatim}
+    >>> m3[1][1] = 66
+    >>> m3
+        0.2      0.4      0.2
+        -0.2       66        0
+        0.2      0.2     -0.2
+    \end{verbatim}
+
+
+
+
+
+
+
+\section{Kalman filter \label{kalmanfilter}}
+    Kalman filter in pNumeric package is designed as general as possible. We can 
+    filter MIMO systems with a nuber of state variables. Also updating of
+    model after every time step is possible (EKF).
+    
+    Following example is to show Kalman filter usage. This is the simplest case of
+    estimating a constant of 501.45 disturbed by white noise.
+    \begin{verbatim}
+    from pnumeric import *
+    from random import gauss
+    
+    length = 30 # data length
+    value  = 501.45 # constant value to be estimated
+    t = range(length)
+    # generate some noise around the value
+    yv = [gauss(value, 9) for x in range(length)]
+    
+    y = Matrix([yv])
+    u = Matrix([[0]*length]) # input values are not necessary - so create Matrix of zeros
+    
+    # define system matrixes
+    A = Matrix([[1]])
+    B = Matrix([[0]])
+    C = Matrix([[1]])
+    D = Matrix([[0]])
+    
+    # process and noise variations
+    Q = Matrix([[0.5]])
+    R = Matrix([[1.0]])
+    
+    # define initial values
+    x0 = Matrix([[500.0]])
+    P0 = Matrix([[9.0]])
+    # process input by Kalman filter
+    x_est, y_est, P_est = kf_process(A, B, C, D, y, u, x0, P0, Q, R)
+    \end{verbatim}
+    
+    x_est now contains list of estimated states, y_est is list of estimated output values and P_est
+    is list of covariance estimations.
+    
+    To update the model, define a Python function
+    \begin{verbatim}
+    # callback for updating the matrixes
+    def callback(step, A, B, C, D, x):
+        A[0][1] = step*dt
+        B[0][0] = 0.5*(step*dt)**2
+        B[1][0] = step*dt
+        # reset the x
+        x[0][0] = s0
+        x[1][0] = v0
+    \end{verbatim}
+    
+    This function parameters are step number an model parameters.
+    Then we can simply put the function callback name as the last parameter to kf_process
+    and filter will automaticaly call the function after every step.
+
+
+
+
+
+
+\section{Fast Fourier Tranform \label{fft}}
+    fft() function computes a spectrum of time series given by a Vector parameter.
+    
+    Example:
+    \begin{verbatim}
+    v = Vector([0, 1, 0, -1, 0, 1, 0, -1]) # create time series Vector
+    out = fft(v)
+    \end{verbatim}
+    
+    fft returns Vector containing sperctrum of time series.
+    
+\section{Statistical methods \label{statmeth}}
+    pNumeric module contains some statistical functions:
+
+    \begin{tabular}{|l|l|} \hline
+    \textbf{function name} & \textbf{Description} \\ \hline
+    mean(Vector v)     & returns mean value of v \\
+    rms(Vector v)      & returns Root Mean Square of v \\
+    \end{tabular}
+\end{document}

@@ -1,0 +1,5 @@
+To install, just run
+
+  python ./setup.py install
+
+This will install pnumeric into Python path as EGG using Distutils.
