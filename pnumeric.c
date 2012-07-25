@@ -28,7 +28,7 @@
 #include "kf.h"    // Kalman filter
 #include "fft.h"   // Fast Fourier Transform
 #include "window.h"
-#include "hpspectrum.h"
+//#include "hpspectrum.h"
 
 #include "pnumeric.h"
 
@@ -219,7 +219,8 @@ fft_process(PyObject *self, VectorObject *v)
 
 /*
  * hpspectrum
- */ 
+ */
+/*
 static PyObject *
 py_hpspectrum(PyObject *self, PyObject *args)
 {
@@ -251,7 +252,7 @@ py_hpspectrum(PyObject *self, PyObject *args)
     Py_INCREF(out);
     return (PyObject*)out;
 }
-
+*/
 
 
 /*
@@ -416,7 +417,7 @@ static PyMethodDef pnumeric_methods[] = {
     {"kf_process", (PyCFunction)kf_process, METH_VARARGS | METH_KEYWORDS, "Kalman filter"},
     //{"resample", (PyCFunction)py_resample, METH_VARARGS, "Resample a vector decimation or interpolation"},
     {"fft", (PyCFunction)fft_process, METH_O, "Fast Fourier Transform"},
-    {"hpspectrum", (PyCFunction)py_hpspectrum, METH_VARARGS, "Harmonic product spectrum of a vector"},
+    //{"hpspectrum", (PyCFunction)py_hpspectrum, METH_VARARGS, "Harmonic product spectrum of a vector"},
     {"rms", (PyCFunction)py_rms, METH_O, "Root Mean Square"},
     {"mean", (PyCFunction)py_mean, METH_O, "Mean value"},
     {"rect", (PyCFunction)py_rect, METH_VARARGS, "Rectangular window"},
