@@ -6,17 +6,17 @@
       Python module.
 
   Copyright (c) 2007 Jiří Popek <jiri.popek@gmail.com>
-  
+
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation; either version 2 of the License, or
   (at your option) any later version.
-  
+
   This program is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License along
   with this program; if not, write to the Free Software Foundation, Inc.,
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -31,11 +31,11 @@
 
 typedef struct {
     PyObject_HEAD
-    
+
     // set this if vector stands for matrix row or a vector slice
     PyObject *object; // pointer to another object (matrix, vector slice)
     Float *p_data; // data pointer into existing data (if vector stands for matrix row of another vector)
-    
+
     // this is useless if vector is matrix row
     int length;
     Float *data;

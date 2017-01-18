@@ -5,17 +5,17 @@
       Matrix datatype related functions for pnumeric Python module.
 
   Copyright (c) 2007 Jiří Popek <jiri.popek@gmail.com>
-  
+
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation; either version 2 of the License, or
   (at your option) any later version.
-  
+
   This program is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License along
   with this program; if not, write to the Free Software Foundation, Inc.,
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -52,11 +52,11 @@ matrix_repr(MatrixObject *v)
     char fstr[64];
     PyObject *s;
     PyObject *result;
-    
+
     if (v->rows == 0 || v->cols == 0) {
         return PyString_FromString("Matrix([])");
     }
-    
+
     result = PyString_FromString("Matrix([\n");
     for (i = 0; i < v->rows; i++) {
         for (j = 0; j < v->cols; j++) {
@@ -66,7 +66,7 @@ matrix_repr(MatrixObject *v)
         }
         PyString_ConcatAndDel(&result, PyString_FromString("\n"));
     }
-    
+
     PyString_ConcatAndDel(&result, PyString_FromString("])"));
     return result;
 }
@@ -85,10 +85,10 @@ matrix_alloc(MatrixObject *mo, int rows, int cols)
         PyErr_NoMemory();
         return 1;
     }
-    
+
     mo->rows = rows;
     mo->cols = cols;
-    
+
     return 0;
 }
 
@@ -105,13 +105,14 @@ matrix_item(MatrixObject *a, int i)
         PyErr_SetObject(PyExc_IndexError, PyString_FromString("row index out of range"));
         return NULL;
     }
-    
+
     out = (PyObject*)matrixrow2vector(a, (a->data) + i*(a->cols));
     //TODO: is this necessary?
     Py_INCREF(out);
-    
+
     return out;
 }
+
 
 
 /*
@@ -121,35 +122,37 @@ PyAPI_FUNC(int)
 matrix_cmp(MatrixObject *self, MatrixObject *other)
 {
     Float *s, *o, sub, max;
-    Float eps = 1e-8; // TODO: hope this will be enough
+    Float eps = 1e-8;  // TODO: hope this will be enough
     int i;
-    
+
     if (self->rows != other->rows || self->cols != other->cols) {
         return 1;
     }
-    
+
     s = self->data;
     o = other->data;
-    
+
     for (i=0; i<(self->rows*self->cols); i++) {
         sub = *s-*o;
         max = MAX(*s, *o);
-        
+
         if (max != 0) {
             sub = sub / max;
         }
-        
+
         s++;
         o++;
-        
+
         if (Fabs(sub) > eps) {
             return 1;
         }
     }
-    
+
     // TODO: which matrix is bigger? (to return -1 instead of 1)
     return 0;
 }
+
+
 
 /*
  * matrix inversion
@@ -158,18 +161,20 @@ PyAPI_FUNC(PyObject *)
 matrix_inv(MatrixObject *self)
 {
     MatrixObject *out;
-    
+
     if (self->rows != self->cols) {
         PyErr_SetString(PyExc_ValueError, "not a square matrix");
         return NULL;
     }
-    
+
     out = matrix_new(self->rows, self->cols);
     m_inversion(self->data, out->data, self->rows);
     Py_INCREF(out);
-    
+
     return (PyObject *)out;
 }
+
+
 
 /*
  * return determinant
@@ -178,12 +183,12 @@ PyAPI_FUNC(PyObject *)
 matrix_det(MatrixObject *self)
 {
     Float det;
-    
+
     if (self->rows != self->cols) {
         PyErr_SetString(PyExc_ValueError, "not a square matrix");
         return NULL;
     }
-    
+
     det = m_det(self->data, self->rows);
     return PyFloat_FromDouble(det);
 }
@@ -197,7 +202,7 @@ PyAPI_FUNC(PyObject *)
 matrix_add(MatrixObject *self, MatrixObject *other)
 {
     MatrixObject *out;
-    
+
     if (self->rows==0 && self->cols==0) { // first matrix is scalar
         out = matrix_new(other->rows, other->cols);
         m_add_scalar(*(self->data), other->data, out->data, other->rows, other->cols);
@@ -212,7 +217,7 @@ matrix_add(MatrixObject *self, MatrixObject *other)
         out = matrix_new(self->rows, other->cols);
         m_add(self->data, other->data, out->data, self->rows, self->cols);
     }
-    
+
     Py_INCREF(out);
     return (PyObject*)out;
 }
@@ -226,7 +231,7 @@ PyAPI_FUNC(PyObject *)
 matrix_negative(MatrixObject *self)
 {
     MatrixObject *out;
-    
+
     out = matrix_new(self->rows, self->cols);
     m_copy(out->data, self->data, self->rows, self->cols);
     m_scale(-1, out->data, out->rows, out->cols);
@@ -244,7 +249,7 @@ matrix_sub(MatrixObject *self, MatrixObject *other)
 {
     MatrixObject *out;
     Float *tmp;
-    
+
     if (self->rows==0 && self->cols==0) { // first matrix is scalar
         out = matrix_new(other->rows, other->cols);
         tmp = m_new(other->rows, other->cols);
@@ -260,11 +265,11 @@ matrix_sub(MatrixObject *self, MatrixObject *other)
             PyErr_SetString(PyExc_ValueError, "Matrixes are not aligned");
             return NULL;
         }
-        
+
         out = matrix_new(self->rows, other->cols);
         m_sub(self->data, other->data, out->data, self->rows, self->cols);
     }
-    
+
     Py_INCREF(out);
     return (PyObject*)out;
 }
@@ -279,7 +284,7 @@ matrix_mul(MatrixObject *self, MatrixObject *other)
 {
     MatrixObject *out;
     DEBUG(" Matrix multiply\n");
-    
+
     if (self->rows==0 && self->cols==0) { // first matrix is scalar
         out = matrix_new(other->rows, other->cols);
         m_copy(out->data, other->data, other->rows, other->cols);
@@ -300,7 +305,7 @@ matrix_mul(MatrixObject *self, MatrixObject *other)
         }
         m_mul(self->data, other->data, out->data, self->rows, self->cols, other->cols);
     }
-    
+
     Py_INCREF(out);
     return (PyObject*)out;
 }
@@ -322,7 +327,7 @@ PyAPI_FUNC(PyObject *)
 matrix_getattr(MatrixObject *self, char *name)
 {
     PyObject *result=NULL;
-    
+
     if (strcmp(name, "shape") == 0) {
         result = PyTuple_New(2);
         PyTuple_SetItem(result, 0, PyInt_FromLong(self->rows));
@@ -346,7 +351,7 @@ matrix_getattr(MatrixObject *self, char *name)
             }
         }
     }
-    
+
     if (result == NULL)
         return Py_FindMethod(MatrixObject_methods, (PyObject *)self, name);
     else
@@ -362,12 +367,12 @@ MatrixObject *
 PyFloat2matrix(const Float value)
 {
     MatrixObject *out;
-    
+
     out = matrix_new(1, 1);
     *(out->data) = value;
     out->rows = 0;
     out->cols = 0;
-    
+
     return out;
 }
 
@@ -384,15 +389,17 @@ matrix_coerce(MatrixObject **v, PyObject **w)
       Py_INCREF(*w);
       return 0;
     }
-    
+
     if (PyFloat_Check(*w)) {
       *w = (PyObject*)PyFloat2matrix((Float)PyFloat_AsDouble(*w));
       Py_INCREF(*w);
       return 0;
     }
-    
-    return 1; // conversion not possible
+
+    return 1;  // conversion not possible
 }
+
+
 
 /*
  * create a new emtpy matrix object
@@ -401,23 +408,23 @@ PyAPI_FUNC(MatrixObject *)
 matrix_new(int rows, int cols)
 {
     MatrixObject *y=NULL;
-    
+
     y = (MatrixObject *) PyMem_Malloc(sizeof(MatrixType));
     if (y == NULL) {
         PyErr_SetString(PyExc_MemoryError, "Can't allocate memory for Matrix");
         return NULL;
     }
-    
+
     PyObject_Init((PyObject *)y, &MatrixType);
     if (matrix_alloc(y, rows, cols)) {
         PyErr_SetString(PyExc_MemoryError, "Can't allocate memory for Matrix data");
         Py_DECREF(y);
         return NULL;
     }
-    
+
     y->rows = rows;
     y->cols = cols;
-    
+
     return y;
 }
 
@@ -436,19 +443,19 @@ matrix_eye(PyObject *self, PyObject *args)
     int i;
     long size;
     MatrixObject *result;
-    
+
     if (!PyArg_ParseTuple(args, "l", &size)) {
         return (MatrixObject*)Py_None;
     }
-    
+
     result = matrix_new(size, size);
     if (!result) return (MatrixObject*)Py_None;
     m_set0(result->data, size, size);
-    
+
     for (i=0; i<size; i++) {
         *(result->data + i*size + i) = 1.0;
     }
-    
+
     return result;
 }
 
@@ -462,16 +469,16 @@ matrix_ones(PyObject *self, PyObject *args)
 {
     long size;
     MatrixObject *result;
-    
+
     if (!PyArg_ParseTuple(args, "l", &size)) {
         return (MatrixObject*)Py_None;
     }
-    
+
     result = matrix_new(size, size);
-    
+
     if (!result)
         return (MatrixObject*)Py_None;
-    
+
     m_set1(result->data, size, size);
     return result;
 }
@@ -489,12 +496,12 @@ MatrixObject_New(PyTypeObject *type, PyObject *args)
     int i, cols=0, rows=0;
     PyObject * (*getitem)(PyObject *, int);
     PyObject *listObject;
-    
+
     if (!PyArg_ParseTuple(args, "O", &listObject)) {
         PyErr_BadArgument();
         return NULL;
     }
-    
+
     // [0]
     if (PyList_Check(listObject)) {
         rows = PyList_Size(listObject);
@@ -509,11 +516,11 @@ MatrixObject_New(PyTypeObject *type, PyObject *args)
         PyErr_BadArgument();
         return NULL;
     }
-    
+
     if (rows == 0) {
         return Py_None;
     }
-    
+
     // [0][0]
     item = (*getitem)(listObject, 0);
     if (PyList_Check(item)) {
@@ -524,13 +531,13 @@ MatrixObject_New(PyTypeObject *type, PyObject *args)
         PyErr_BadArgument();
         return NULL;
     }
-    
+
     self = matrix_new(rows, cols);
     if (self == NULL) {
         PyErr_NoMemory();
         return NULL;
     }
-    
+
     if (cols > 0) {
         for (i=0; i<rows; i++) {
             w = (*getitem)(listObject, i);
@@ -540,7 +547,7 @@ MatrixObject_New(PyTypeObject *type, PyObject *args)
             }
         }
     }
-    
+
     Py_INCREF(self);
     return (PyObject*)self;
 }
@@ -555,16 +562,16 @@ matrix_zeros(PyObject *self, PyObject *args)
 {
     long size;
     MatrixObject *result;
-    
+
     if (!PyArg_ParseTuple(args, "l", &size)) {
         return (MatrixObject*)Py_None;
     }
-    
+
     result = matrix_new(size, size);
-    
+
     if (!result)
         return (MatrixObject*)Py_None;
-    
+
     m_set0(result->data, size, size);
     return result;
 }
@@ -669,4 +676,3 @@ PyAPI_DATA(PyTypeObject) MatrixType = {
     0,                         /* tp_alloc */
     0,//MatrixObject_New,      /* tp_new */
 };
-

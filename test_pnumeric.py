@@ -8,17 +8,17 @@
      Tests for pnumeric Python module.
 
   Copyright (c) 2007 Jiří Popek <jiri.popek@gmail.com>
-  
+
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation; either version 2 of the License, or
   (at your option) any later version.
-  
+
   This program is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License along
   with this program; if not, write to the Free Software Foundation, Inc.,
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -29,8 +29,9 @@ import unittest
 from pnumeric import *
 from math import pi, sin
 
+
 class TestSequenceFunctions(unittest.TestCase):
-    
+
     def test_creating(self):
         '''creating matrixes'''
         a2 = Matrix([[.1, .2], [-.2, .1]])
@@ -118,7 +119,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(Matrix([[3, 5], [7, 9]]), res)
         res = 3-ab
         self.assertEqual(Matrix([[-3, -5], [-7, -9]]), res)
-    
+
     def test_matrix_row(self):
         a3 = Matrix([[.2, .4, .2], [-.2, .2, .0], [.2, .2, -.2]])
         r = a3[1]
@@ -131,29 +132,29 @@ class TestSequenceFunctions(unittest.TestCase):
         a3[1][2] = 33
         tmp = Matrix([[.2, .4, .2], [-.2, .2, 33], [.2, .2, -.2]])
         self.assertEqual(a3, tmp)
-    
+
     def test_vector(self):
         v = Vector([.2, .4, .2, -3333, 41, 89.444444])
-    
+
     def test_vector_mul(self):
         v = Vector([1, 2, 3])
-        
+
         self.assertEqual(v*5.0, Vector([5, 10, 15]))
         self.assertEqual(5*v, Vector([5, 10, 15]))
         self.assertEqual(5.0*v, Vector([5.0, 10.0, 15.0]))
         self.assertEqual(Vector([2])*v, Vector([2.0, 4.0, 6.0]))
         self.assertEqual(Vector([1, 2, 3])*v, Vector([1.0, 4.0, 9.0]))
         self.assertRaises(ValueError, lambda: Vector([1, 2])*v)
-    
+
     def test_vector_abs(self):
         v = abs(Vector([.2, -3333, 41, -89.444444]))
         self.assertEqual(v, Vector([.2, 3333, 41, 89.444444]))
-    
-    def test_slice(self): #TODO
+
+    def test_slice(self):  #TODO
         v = Vector([0, 1, 2, -4, 6, 7, 8, 9])
         s = v[2:5]
         self.assertEqual(s, Vector([2.0, -4.0, 6.0]))
-    
+
     def test_vrange(self):
         v = vrange(10)
         self.assertEqual(v, Vector([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]))
@@ -168,11 +169,11 @@ class TestSequenceFunctions(unittest.TestCase):
         v = vrange(0.5, 1.1, 0.1)
         v2 = Vector([0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1])
         self.assertEqual(v, v2)
-    
+
     def x_test_fft(self):
         v = Vector([0, 1, 0, -1, 0, 1, 0, -1])
         out = fft(v)
-    
+
     def x_test_fft2(self):
         from matplotlib import pylab
         from math import pi, sin
@@ -182,27 +183,27 @@ class TestSequenceFunctions(unittest.TestCase):
         pylab.plot(f[:len(f)/2])
         #pylab.plot(pylab.fft(v))
         pylab.show()
-     
+
     def test_rms(self):
         v = [sin(2*pi*y/1023.) for y in range(1024)]
         v = Vector(v)
         r = rms(v)
         self.assert_(r>0.7067 and r<0.7068)
-    
+
     def test_rect(self):
         v = Vector(100 * [1.0])
         self.assertEquals(v, Vector(rect(100)))
-    
+
     def test_hann(self):
         v = Vector([0.00000, 0.11698, 0.41318, 0.75000, 0.96985, 0.96985, 0.75000, 0.41318, 0.11698, 0.00000])
         h = Vector([round(x, 5) for x in hann(10)])
         self.assertEquals(v, h)
-    
+
     def test_hamm(self):
         v = Vector([0.080000, 0.187620, 0.460122, 0.770000, 0.972259, 0.972259, 0.770000, 0.460122, 0.187620, 0.080000])
         h = Vector([round(x, 6) for x in hamming(10)])
         self.assertEquals(v, h)
 
+
 if __name__ == '__main__':
     unittest.main()
-
