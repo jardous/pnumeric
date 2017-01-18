@@ -26,8 +26,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#define    PI 3.1415926535897932
-#define TWOPI 6.2831853071795864
+#define    PI M_PI  // from math.h
+#define TWOPI (2*M_PI)
 
 #include "m2/m2.h"
 
